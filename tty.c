@@ -1426,6 +1426,24 @@ tty_cmd_setselection(struct tty *tty, const struct tty_ctx *ctx)
 }
 
 void
+tty_cmd_setselection_ex(struct tty *tty, const struct tty_ctx *ctx)
+{
+	char	*buf;
+	size_t	 off;
+
+	if (!tty_term_has(tty->term, TTYC_MS))
+		return;
+
+	off = 4 * ((ctx->num + 2) / 3) + 1; /* storage for base64 */
+	buf = xmalloc(off);
+
+	b64_ntop(ctx->ptr, ctx->num, buf, off);
+	tty_putcode_ptr2(tty, TTYC_MS, ctx->p1, buf);
+
+	free(buf);
+}
+
+void
 tty_cmd_rawstring(struct tty *tty, const struct tty_ctx *ctx)
 {
 	tty_add(tty, ctx->ptr, ctx->num);

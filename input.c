@@ -2280,6 +2280,10 @@ input_osc_52(struct window_pane *wp, const char *p)
 	int			 outlen, state;
 	struct screen_write_ctx	 ctx;
 
+	char			bufname[16];	  /* up to 15 bytes */
+	const char		*name = NULL;
+	size_t			bufname_size, ll;
+
 	state = options_get_number(global_options, "set-clipboard");
 	if (state != 2)
 		return;
@@ -2289,6 +2293,12 @@ input_osc_52(struct window_pane *wp, const char *p)
 	end++;
 	if (*end == '\0')
 		return;
+
+	bufname_size = sizeof(bufname);
+	memset(bufname, 0, bufname_size);
+	ll = end - p - 1;
+	strncpy(bufname, p, bufname_size < ll ? bufname_size : ll);
+	bufname[bufname_size - 1] = '\0';
 
 	len = (strlen(end) / 4) * 3;
 	if (len == 0)
@@ -2301,11 +2311,16 @@ input_osc_52(struct window_pane *wp, const char *p)
 	}
 
 	screen_write_start(&ctx, wp, NULL);
-	screen_write_setselection(&ctx, out, outlen);
+	screen_write_setselection_ex(&ctx, bufname, out, outlen);
 	screen_write_stop(&ctx);
 	notify_pane("pane-set-clipboard", wp);
 
 	paste_add(out, outlen);
+
+	paste_get_top(&name);
+	log_debug("paste name = \"%s\" => \"%s\"\n", name, bufname);
+	if(name != NULL)
+		paste_rename(name, bufname, NULL);
 }
 
 /* Handle the OSC 104 sequence for unsetting (multiple) palette entries. */

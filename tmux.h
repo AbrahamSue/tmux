@@ -1151,6 +1151,7 @@ struct tty_ctx {
 
 	u_int		 num;
 	void		*ptr;
+	void		*p1;
 
 	/*
 	 * Cursor and region position before the screen was updated - this is
@@ -1736,6 +1737,7 @@ void	tty_cmd_linefeed(struct tty *, const struct tty_ctx *);
 void	tty_cmd_scrollup(struct tty *, const struct tty_ctx *);
 void	tty_cmd_reverseindex(struct tty *, const struct tty_ctx *);
 void	tty_cmd_setselection(struct tty *, const struct tty_ctx *);
+void	tty_cmd_setselection_ex(struct tty *, const struct tty_ctx *);
 void	tty_cmd_rawstring(struct tty *, const struct tty_ctx *);
 
 /* tty-term.c */
@@ -2094,6 +2096,7 @@ void	 screen_write_collect_add(struct screen_write_ctx *,
 	     const struct grid_cell *);
 void	 screen_write_cell(struct screen_write_ctx *, const struct grid_cell *);
 void	 screen_write_setselection(struct screen_write_ctx *, u_char *, u_int);
+void	 screen_write_setselection_ex(struct screen_write_ctx *, u_char *, u_char *, u_int);
 void	 screen_write_rawstring(struct screen_write_ctx *, u_char *, u_int);
 
 /* screen-redraw.c */
